@@ -107,15 +107,15 @@ create table game_logs (
 **Goal**: Allow GMs to create campaigns and manage the basic settings.
 
 ### 2.1 Components
-*   `CampaignList`: Grid view of campaigns.
-*   `CreateCampaignModal`: Form to set title and system.
-*   `CampaignDashboard`: Main layout for a specific campaign.
-*   `InviteLinkGenerator`: Component to display/refresh the invite code.
+*   [x] `CampaignList`: Grid view of campaigns.
+*   [x] `CreateCampaignModal`: Form to set title and system.
+*   [x] `CampaignDashboard`: Main layout for a specific campaign.
+*   [x] `InviteLinkGenerator`: Component to display/refresh the invite code.
 
 ### 2.2 Server Actions
-*   `createCampaign(formData)`
-*   `updateCampaignSettings(id, data)`
-*   `deleteCampaign(id)`
+*   [x] `createCampaign(formData)`
+*   [ ] `updateCampaignSettings(id, data)`
+*   [ ] `deleteCampaign(id)`
 
 ---
 
@@ -123,14 +123,14 @@ create table game_logs (
 **Goal**: A functional, interactive character sheet.
 
 ### 3.1 Components
-*   `CharacterBuilder`: Wizard to step through creation (Race -> Class -> Stats).
-*   `StatBlock`: Component to display Str/Dex/Con etc. with modifiers.
-*   `InventoryGrid`: Grid displaying items.
-*   `DiceRoller`: Floating or sidebar component accessible at all times.
+*   [x] `CharacterBuilder`: Wizard to step through creation (Race -> Class -> Stats).
+*   [ ] `StatBlock`: Component to display Str/Dex/Con etc. with modifiers.
+*   [ ] `InventoryGrid`: Grid displaying items.
+*   [x] `DiceRoller`: Floating or sidebar component accessible at all times.
 
 ### 3.2 Logic
-*   **Auto-calculation**: Helper functions to derive modifiers from scores (e.g., `(Score - 10) / 2`).
-*   **Real-time Sync**: Subscribing to `characters` table changes so the GM sees updates instantly.
+*   [x] `createCharacter` server action.
+*   [x] **Real-time Sync**: Subscribing to `characters` table changes so the GM sees updates instantly.
 
 ---
 
@@ -138,14 +138,15 @@ create table game_logs (
 **Goal**: The shared space where the game happens.
 
 ### 4.1 Map System
-*   **Canvas/WebGL Viewer**: Use `react-konva` or HTML5 Canvas for the map.
-*   **Fog of War**: Implement a mask layer that the GM can erase/paint.
-*   **Token Layer**: Draggable tokens synced via Supabase Realtime.
+*   [x] **Canvas/WebGL Viewer**: Use `react-konva` or HTML5 Canvas for the map.
+*   [ ] **Fog of War**: Implement a mask layer that the GM can erase/paint.
+*   [x] **Token Layer**: Draggable tokens synced via Supabase Realtime.
+*   [x] **Map Creation**: Upload and Generate (Stub) maps.
 
 ### 4.2 Dice & Chat
-*   **Supabase Realtime**: Listen for `INSERT` on `game_logs`.
-*   **Dice Animation**: Use a library like `react-dice-complete` or custom CSS 3D dice.
-*   **Chat Window**: [DEFERRED] Standard chat interface with roll parsing (e.g., `/r 1d20`). Note: We are currently skipping the text chat input feature to focus on core gameplay mechanics first.
+*   [x] **Supabase Realtime**: Listen for `INSERT` on `game_logs`.
+*   [x] **Dice Animation**: Basic random number generation with history.
+*   [ ] **Chat Window**: [DEFERRED] Standard chat interface with roll parsing (e.g., `/r 1d20`). Note: We are currently skipping the text chat input feature to focus on core gameplay mechanics first.
 
 ---
 
