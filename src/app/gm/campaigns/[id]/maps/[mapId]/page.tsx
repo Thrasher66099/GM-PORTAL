@@ -1,10 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import ActivateMapButton from '@/components/map/ActivateMapButton'
-
-// Dynamically import MapViewer to avoid SSR issues with Canvas
-const MapViewer = dynamic(() => import('@/components/map/MapViewer'), { ssr: false })
+import MapViewerWrapper from '@/components/map/MapViewerWrapper'
 
 export default async function MapPage({ params }: { params: Promise<{ id: string, mapId: string }> }) {
     const supabase = await createClient()
@@ -28,7 +25,7 @@ export default async function MapPage({ params }: { params: Promise<{ id: string
                 <ActivateMapButton campaignId={id} mapId={mapId} isActive={map.is_active} />
             </div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <MapViewer mapId={mapId} campaignId={id} initialData={map as any} isGM={true} />
+            <MapViewerWrapper mapId={mapId} campaignId={id} initialData={map as any} isGM={true} />
         </div>
     )
 }

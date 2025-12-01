@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams } from 'next/navigation';
+import { sendChatMessage } from '@/app/actions/chat';
 
 type LogEntry = {
     id: string;
@@ -138,11 +139,46 @@ export default function GameLog() {
                                 </span>
                             </div>
                         ) : (
-                            <div>{log.content.message}</div>
+                            <div>{log.content?.message || JSON.stringify(log.content)}</div>
                         )}
                     </div>
                 ))}
             </div>
+
+            <form
+                onSubmit={async (e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const input = form.elements.namedItem('message') as HTMLInputElement;
+                    const message = input.value.trim();
+
+                    if (message) {
+                        input.value = ''; // Optimistic clear
+                        try {
+                            await sendChatMessage(campaignId, message);
+                        } catch (error) {
+                            console.error(error);
+                            alert('Failed to send message');
+                        }
+                    }
+                }}
+                style={{
+                    padding: '0.5rem',
+                    borderTop: '1px solid var(--color-border)',
+                    display: 'flex',
+                    gap: '0.5rem'
+                }}
+            >
+                <input
+                    type="text"
+                    name="message"
+                    placeholder="Type a message..."
+                    className="input"
+                    style={{ flex: 1 }}
+                    autoComplete="off"
+                />
+                <button type="submit" className="btn btn-primary">Send</button>
+            </form>
         </div>
     );
 }

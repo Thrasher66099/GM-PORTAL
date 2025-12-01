@@ -1,9 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
-
-// Dynamically import MapViewer to avoid SSR issues with Canvas
-const MapViewer = dynamic(() => import('@/components/map/MapViewer'), { ssr: false })
+import MapViewerWrapper from '@/components/map/MapViewerWrapper'
 
 export default async function PlayerMapPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -59,7 +56,7 @@ export default async function PlayerMapPage({ params }: { params: Promise<{ id: 
                 </Link>
             </div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <MapViewer mapId={map.id} campaignId={id} initialData={map as any} isGM={false} currentUserCharacterId={characterId} />
+            <MapViewerWrapper mapId={map.id} campaignId={id} initialData={map as any} isGM={false} currentUserCharacterId={characterId} />
         </div>
     )
 }
