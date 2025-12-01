@@ -28,7 +28,7 @@ export default async function MapPage({ params }: { params: Promise<{ id: string
                 <ActivateMapButton campaignId={id} mapId={mapId} isActive={map.is_active} />
             </div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <MapViewer mapId={mapId} initialData={map as any} isGM={true} />
+            <MapViewer mapId={mapId} campaignId={id} initialData={map as any} isGM={true} />
         </div>
     )
 }

@@ -4,6 +4,7 @@ import { Stage, Layer, Image as KonvaImage, Circle, Line } from 'react-konva'
 import useImage from 'use-image'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import AddTokenModal from './AddTokenModal'
 
 type Token = {
     id: string
@@ -11,6 +12,7 @@ type Token = {
     y: number
     color: string
     label: string
+    character_id?: string
 }
 
 type MapData = {
@@ -20,7 +22,7 @@ type MapData = {
     tokens: Token[]
 }
 
-export default function MapViewer({ mapId, initialData, isGM = false }: { mapId: string, initialData: MapData, isGM?: boolean }) {
+export default function MapViewer({ mapId, campaignId, initialData, isGM = false }: { mapId: string, campaignId: string, initialData: MapData, isGM?: boolean }) {
     const [mapData] = useState<MapData>(initialData)
     const [image] = useImage(mapData.image_url)
     const [tokens, setTokens] = useState<Token[]>(mapData.tokens || [])
@@ -129,8 +131,13 @@ export default function MapViewer({ mapId, initialData, isGM = false }: { mapId:
         return lines
     }
 
+    const [showTokenModal, setShowTokenModal] = useState(false)
+
+    // ... (existing code)
+
     return (
         <div className="card glass" style={{ padding: 0, overflow: 'hidden', height: '600px', position: 'relative' }}>
+            {/* ... (Stage) ... */}
             <Stage
                 width={800} // Should be dynamic
                 height={600}
@@ -189,22 +196,32 @@ export default function MapViewer({ mapId, initialData, isGM = false }: { mapId:
                     </button>
                     <button
                         className="btn btn-primary"
-                        onClick={async () => {
-                            const newToken: Token = {
-                                id: crypto.randomUUID(),
-                                x: 150,
-                                y: 150,
-                                color: 'blue',
-                                label: 'Player'
-                            }
-                            const newTokens = [...tokens, newToken]
-                            setTokens(newTokens)
-                            await supabase.from('maps').update({ tokens: newTokens }).eq('id', mapId)
-                        }}
+                        onClick={() => setShowTokenModal(true)}
                     >
                         + Add Player
                     </button>
                 </div>
+            )}
+
+            {showTokenModal && (
+                <AddTokenModal
+                    campaignId={campaignId}
+                    onAdd={async (char) => {
+                        const newToken: Token = {
+                            id: crypto.randomUUID(),
+                            x: 150,
+                            y: 150,
+                            color: 'blue', // Could be dynamic based on class
+                            label: char.name,
+                            character_id: char.id
+                        }
+                        const newTokens = [...tokens, newToken]
+                        setTokens(newTokens)
+                        await supabase.from('maps').update({ tokens: newTokens }).eq('id', mapId)
+                        setShowTokenModal(false)
+                    }}
+                    onClose={() => setShowTokenModal(false)}
+                />
             )}
         </div>
     )

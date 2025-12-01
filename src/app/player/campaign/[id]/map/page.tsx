@@ -42,7 +42,7 @@ export default async function PlayerMapPage({ params }: { params: Promise<{ id: 
                 </Link>
             </div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <MapViewer mapId={map.id} initialData={map as any} isGM={false} />
+            <MapViewer mapId={map.id} campaignId={id} initialData={map as any} isGM={false} />
         </div>
     )
 }
