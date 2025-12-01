@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import DiceRoller from '@/components/DiceRoller'
+import GameLog from '@/components/GameLog'
 
 export default async function PlayerCampaignDashboard({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -58,13 +59,12 @@ export default async function PlayerCampaignDashboard({ params }: { params: Prom
                     <p style={{ color: 'var(--color-text-muted)' }}>Map View Coming Soon</p>
                 </div>
 
+
                 {/* Sidebar (Chat/Log) */}
                 <div className="flex flex-col" style={{ gap: '1rem' }}>
-                    <div className="card glass" style={{ flex: 1, minHeight: '500px' }}>
-                        <h3>Session Log</h3>
-                        <div style={{ marginTop: '1rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                            <p>You joined the campaign.</p>
-                        </div>
+                    <div className="card glass" style={{ flex: 1, minHeight: '500px', display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)' }}>Session Log</h3>
+                        <GameLog />
                     </div>
                 </div>
             </div>
