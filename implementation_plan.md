@@ -145,7 +145,7 @@ create table game_logs (
 ### 4.2 Dice & Chat
 *   **Supabase Realtime**: Listen for `INSERT` on `game_logs`.
 *   **Dice Animation**: Use a library like `react-dice-complete` or custom CSS 3D dice.
-*   **Chat Window**: Standard chat interface with roll parsing (e.g., `/r 1d20`).
+*   **Chat Window**: [DEFERRED] Standard chat interface with roll parsing (e.g., `/r 1d20`). Note: We are currently skipping the text chat input feature to focus on core gameplay mechanics first.
 
 ---
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function CampaignDashboard({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -39,9 +40,9 @@ export default async function CampaignDashboard({ params }: { params: Promise<{ 
                 <div className="card glass">
                     <h3>Quick Actions</h3>
                     <div className="flex flex-col" style={{ gap: '1rem' }}>
-                        <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+                        <Link href={`/gm/campaigns/${id}/maps/new`} className="btn btn-secondary" style={{ justifyContent: 'flex-start', textDecoration: 'none', color: 'var(--color-text)' }}>
                             🗺️ Create New Map
-                        </button>
+                        </Link>
                         <button className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
                             👤 Generate NPC
                         </button>
