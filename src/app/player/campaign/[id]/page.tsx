@@ -49,7 +49,9 @@ export default async function PlayerCampaignDashboard({ params }: { params: Prom
                     <Link href={`/player/character/${character.id}`} className="btn btn-secondary">
                         Character Sheet
                     </Link>
-                    <button className="btn btn-primary">Open Map</button>
+                    <Link href={`/player/campaign/${id}/map`} className="btn btn-primary">
+                        Open Map
+                    </Link>
                 </div>
             </div>
 
