@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { login, signup } from '@/app/auth/actions';
 
 export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
     return (
@@ -10,18 +11,26 @@ export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
             </h2>
             <form className="flex flex-col" style={{ gap: '1rem' }}>
                 <input
+                    name="email"
                     type="email"
                     placeholder="Email"
                     className="glass"
                     style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', color: 'white', border: '1px solid var(--color-border)' }}
+                    required
                 />
                 <input
+                    name="password"
                     type="password"
                     placeholder="Password"
                     className="glass"
                     style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', color: 'white', border: '1px solid var(--color-border)' }}
+                    required
                 />
-                <button className="btn btn-primary" style={{ marginTop: '1rem' }}>
+                <button
+                    formAction={type === 'login' ? login : signup}
+                    className="btn btn-primary"
+                    style={{ marginTop: '1rem' }}
+                >
                     {type === 'login' ? 'Login' : 'Sign Up'}
                 </button>
             </form>
