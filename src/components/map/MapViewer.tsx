@@ -5,6 +5,7 @@ import useImage from 'use-image'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import AddTokenModal from './AddTokenModal'
+import { updateMapTokens } from '@/app/actions/map'
 
 type Token = {
     id: string
@@ -22,7 +23,7 @@ type MapData = {
     tokens: Token[]
 }
 
-export default function MapViewer({ mapId, campaignId, initialData, isGM = false }: { mapId: string, campaignId: string, initialData: MapData, isGM?: boolean }) {
+export default function MapViewer({ mapId, campaignId, initialData, isGM = false, currentUserCharacterId }: { mapId: string, campaignId: string, initialData: MapData, isGM?: boolean, currentUserCharacterId?: string }) {
     const [mapData] = useState<MapData>(initialData)
     const [image] = useImage(mapData.image_url)
     const [tokens, setTokens] = useState<Token[]>(mapData.tokens || [])
@@ -77,9 +78,9 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTokenDragEnd = async (e: any, tokenId: string) => {
-        if (!isGM) return // Only GM can move tokens for now (or implement ownership check)
-
+        // Optimistic update
         const newTokenState = tokens.map(t => {
             if (t.id === tokenId) {
                 // Snap to grid
@@ -93,11 +94,13 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
 
         setTokens(newTokenState)
 
-        // Save to DB
-        await supabase
-            .from('maps')
-            .update({ tokens: newTokenState })
-            .eq('id', mapId)
+        // Save to DB via Server Action
+        try {
+            await updateMapTokens(mapId, newTokenState)
+        } catch (error) {
+            console.error('Failed to move token:', error)
+            // Revert on error (optional, but good UX)
+        }
     }
 
     // Render Grid
@@ -161,7 +164,7 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
                             y={token.y}
                             radius={mapData.grid_data.size / 2 - 2}
                             fill={token.color}
-                            draggable={isGM} // Allow drag if GM
+                            draggable={isGM || (!!token.character_id && token.character_id === currentUserCharacterId)} // Allow drag if GM or owner
                             onDragEnd={(e) => handleTokenDragEnd(e, token.id)}
                             shadowColor="black"
                             shadowBlur={5}

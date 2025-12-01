@@ -33,6 +33,23 @@ export default async function PlayerMapPage({ params }: { params: Promise<{ id: 
         )
     }
 
+    // Fetch the user's character for this campaign
+    const { data: { user } } = await supabase.auth.getUser()
+    let characterId = undefined
+
+    if (user) {
+        const { data: character } = await supabase
+            .from('characters')
+            .select('id')
+            .eq('campaign_id', id)
+            .eq('player_id', user.id)
+            .single()
+
+        if (character) {
+            characterId = character.id
+        }
+    }
+
     return (
         <div className="container">
             <div className="flex items-center justify-between" style={{ marginBottom: '1rem' }}>
@@ -42,7 +59,7 @@ export default async function PlayerMapPage({ params }: { params: Promise<{ id: 
                 </Link>
             </div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <MapViewer mapId={map.id} campaignId={id} initialData={map as any} isGM={false} />
+            <MapViewer mapId={map.id} campaignId={id} initialData={map as any} isGM={false} currentUserCharacterId={characterId} />
         </div>
     )
 }
