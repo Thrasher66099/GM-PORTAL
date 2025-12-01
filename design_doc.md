@@ -11,35 +11,43 @@ Tabletop Nexus is a comprehensive digital companion for Tabletop Role-Playing Ga
 
 ## 3. Core Features
 
-### 3.1 GM Portal
+### 3.1 Authentication & Roles
+*   **Unified Login**: Single entry point for all users.
+*   **Role-Based Access**:
+    *   **GM (Game Master)**: Has administrative control over campaigns, can invite players, and access generation tools.
+    *   **Player**: Can join campaigns via invite code, manage their specific character, and view player-facing maps/journals.
+
+### 3.2 GM Portal (The Creator's Forge)
 The command center for the Game Master.
 *   **Campaign Manager**: Create and organize multiple campaigns.
-*   **AI Campaign Assistant**:
-    *   **Lore Generator**: Create histories, pantheons, and factions based on prompts.
-    *   **Session Planner**: Outline plot points and encounters.
-    *   **NPC Generator**: Create detailed NPCs with stats, backstories, and quirks.
-*   **Asset Studio (Flavor Creation)**:
-    *   **Style Selector**: Define the artistic direction of the campaign (e.g., "Dark Fantasy Oil Painting", "Cel-Shaded Anime", "Classic Sketch").
-    *   **Item Image Generator**: Generate unique visuals for loot and artifacts based on the selected style.
-    *   **Scene Visualizer**: Generate mood images for locations.
+*   **AI Asset Generator**:
+    *   **Maps**: Generate dungeon layouts or upload existing maps.
+    *   **Items**: Create magical items with stats, lore, and *unique generated artwork*.
+    *   **NPCs**: Generate detailed NPCs with stats, backstories, quirks, and portraits.
+    *   **Monsters**: Generate stat blocks and visual tokens for enemies.
+*   **Session Management**:
+    *   **Scene Control**: Manage which map or scene is currently active for players.
+    *   **Fog of War**: Control what players can see on the map.
+    *   **Combat Tracker**: Manage initiative and HP for all entities.
 
-### 3.2 Player Portal
+### 3.3 Player Portal (The Adventurer's Kit)
 A dedicated view for players to interact with the game.
-*   **Digital Character Sheets**: Full support for stats, skills, spells, and inventory.
-    *   *Auto-calculations* for modifiers and combat stats.
-*   **Journal**: Personal notes and quest logs.
-*   **Loot Bag**: Visual inventory showing generated item images.
+*   **Digital Character Sheet**:
+    *   **Live Stats**: Real-time tracking of HP, AC, Speed, etc.
+    *   **Inventory**: Visual grid showing items (with their generated art).
+    *   **Spells & Abilities**: Quick reference cards for class features.
+*   **Interactive Dice Roller**:
+    *   **Customizable Dice**: Select standard dice (d4, d6, d8, d10, d12, d20) or custom values.
+    *   **Multi-Roll**: Roll multiple dice at once (e.g., "4d6" or "2d20 + 5").
+    *   **Visual Feedback**: 3D or animated 2D dice rolling on screen.
+    *   **Log**: History of rolls shared with the GM (to prevent cheating).
+*   **Journal & Notes**: Personal quest logs and session notes.
 
-### 3.3 Interactive Maps & Combat
-*   **Dungeon Map Viewer**:
-    *   GM uploads or generates maps.
-    *   **Fog of War**: GM controls visibility.
-    *   **Token Management**: Move player and monster tokens in real-time.
-*   **Dice Roller**: Integrated 3D dice rolling with shared results in the chat/log.
-
-### 3.4 Rules & Mechanics
-*   **System Agnostic Core** (initially focused on 5E OGL for structure).
-*   **Homebrew Support**: Allow GMs to edit stats and items manually.
+### 3.4 Interactive Maps & Real-time Play
+*   **Shared Map View**:
+    *   Players see the map revealed by the GM.
+    *   Real-time token movement (synced via Supabase Realtime).
+*   **Live Chat/Log**: A scrolling log of dice rolls, loot acquisition, and chat messages.
 
 ## 4. User Experience (UX) & Design
 *   **Aesthetics**: "Premium & Immersive". Dark mode by default, utilizing glassmorphism and high-quality typography (e.g., Inter, Cinzel for headers).
