@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function CharacterSheetPage() {
-    const [stats, setStats] = useState({
+    const [stats] = useState({
         str: 16, dex: 14, con: 15, int: 10, wis: 12, cha: 8
     });
 

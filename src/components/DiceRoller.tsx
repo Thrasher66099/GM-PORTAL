@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export default function DiceRoller() {
     const [history, setHistory] = useState<string[]>([]);
     const [result, setResult] = useState<number | null>(null);
 
-    const roll = (sides: number) => {
+    const roll = useCallback((sides: number) => {
         const val = Math.floor(Math.random() * sides) + 1;
         setResult(val);
         setHistory(prev => [`d${sides}: ${val}`, ...prev].slice(0, 5));
-    };
+    }, []);
 
     return (
         <div className="card glass" style={{ position: 'fixed', bottom: '2rem', right: '2rem', width: '300px', zIndex: 50 }}>

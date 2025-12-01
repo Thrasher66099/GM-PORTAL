@@ -1,14 +1,48 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { login, signup } from '@/app/auth/actions';
 
 export default function AuthForm({ type }: { type: 'login' | 'signup' }) {
+    const searchParams = useSearchParams();
+    const error = searchParams.get('error');
+    const message = searchParams.get('message');
+
     return (
         <div className="card glass" style={{ maxWidth: '400px', width: '100%', padding: '2rem' }}>
             <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>
                 {type === 'login' ? 'Welcome Back' : 'Join the Adventure'}
             </h2>
+
+            {error && (
+                <div style={{
+                    backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                    border: '1px solid rgba(220, 38, 38, 0.5)',
+                    color: '#fca5a5',
+                    padding: '0.75rem',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: '1rem',
+                    textAlign: 'center'
+                }}>
+                    {error}
+                </div>
+            )}
+
+            {message && (
+                <div style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    border: '1px solid rgba(16, 185, 129, 0.5)',
+                    color: '#6ee7b7',
+                    padding: '0.75rem',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: '1rem',
+                    textAlign: 'center'
+                }}>
+                    {message}
+                </div>
+            )}
+
             <form className="flex flex-col" style={{ gap: '1rem' }}>
                 <input
                     name="email"

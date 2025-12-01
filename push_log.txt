@@ -1,0 +1,15 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ • 20251201110000_initial_schema.sql
+
+ [Y/n] Y
+Applying migration 20251201110000_initial_schema.sql...
+NOTICE (42710): extension "uuid-ossp" already exists, skipping
+ERROR: function uuid_generate_v4() does not exist (SQLSTATE 42883)
+At statement: 2                                                   
+-- Campaigns                                                      
+create table campaigns (                                          
+  id uuid default uuid_generate_v4() primary key,                 
+                  ^                                               
+Try rerunning the command with --debug to troubleshoot the error.
