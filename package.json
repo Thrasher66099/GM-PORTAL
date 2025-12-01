@@ -11,9 +11,12 @@
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
+    "konva": "^10.0.12",
     "next": "16.0.4",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-konva": "^19.2.1",
+    "use-image": "^1.1.4"
   },
   "devDependencies": {
     "@types/node": "^20",
