@@ -9,3 +9,4 @@ Tabletop Nexus is a next-generation D&D/Tabletop companion app designed to empow
 ## Getting Started
 *   Review the Design Document to understand the scope.
 *   The project is currently in the **Planning Phase**.
+*   **Status**: Active Development
