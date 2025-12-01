@@ -167,6 +167,45 @@ export default function MapViewer({ mapId, initialData, isGM = false }: { mapId:
             <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '4px' }}>
                 <small style={{ color: 'white' }}>Scroll to Zoom • Drag to Pan</small>
             </div>
+
+            {isGM && (
+                <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', gap: '0.5rem' }}>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={async () => {
+                            const newToken: Token = {
+                                id: crypto.randomUUID(),
+                                x: 100,
+                                y: 100,
+                                color: 'red',
+                                label: 'Enemy'
+                            }
+                            const newTokens = [...tokens, newToken]
+                            setTokens(newTokens)
+                            await supabase.from('maps').update({ tokens: newTokens }).eq('id', mapId)
+                        }}
+                    >
+                        + Add Enemy
+                    </button>
+                    <button
+                        className="btn btn-primary"
+                        onClick={async () => {
+                            const newToken: Token = {
+                                id: crypto.randomUUID(),
+                                x: 150,
+                                y: 150,
+                                color: 'blue',
+                                label: 'Player'
+                            }
+                            const newTokens = [...tokens, newToken]
+                            setTokens(newTokens)
+                            await supabase.from('maps').update({ tokens: newTokens }).eq('id', mapId)
+                        }}
+                    >
+                        + Add Player
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
