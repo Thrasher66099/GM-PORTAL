@@ -141,7 +141,7 @@ create table game_logs (
 
 ### 4.1 Map System
 *   [x] **Canvas/WebGL Viewer**: Use `react-konva` or HTML5 Canvas for the map.
-*   [ ] **Fog of War**: Implement a mask layer that the GM can erase/paint.
+*   [x] **Fog of War**: Implement a mask layer that the GM can erase/paint.
 *   [x] **Token Layer**: Draggable tokens synced via Supabase Realtime.
 *   [x] **Map Creation**: Upload and Generate (Stub) maps.
 *   [x] **Active Map**: GM can activate a map for players to see.
