@@ -3,13 +3,23 @@
 import { createCharacter } from '@/app/player/character/actions'
 import { useState } from 'react'
 
-export default function CharacterCreationForm({ campaignId }: { campaignId: string }) {
+export default function CharacterCreationForm({ campaignId, rulesetConfig }: { campaignId: string, rulesetConfig: any }) {
     const [isLoading, setIsLoading] = useState(false)
-    const [stats, setStats] = useState({
-        str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10
+    const [stats, setStats] = useState<Record<string, number>>(() => {
+        const initial: Record<string, number> = {}
+        if (rulesetConfig?.stats) {
+            rulesetConfig.stats.forEach((stat: any) => {
+                initial[stat.key] = 10
+            })
+        } else {
+            // Fallback
+            initial.str = 10; initial.dex = 10; initial.con = 10;
+            initial.int = 10; initial.wis = 10; initial.cha = 10;
+        }
+        return initial
     })
 
-    const handleStatChange = (stat: keyof typeof stats, value: string) => {
+    const handleStatChange = (stat: string, value: string) => {
         const num = parseInt(value) || 0
         setStats(prev => ({ ...prev, [stat]: num }))
     }
@@ -28,6 +38,15 @@ export default function CharacterCreationForm({ campaignId }: { campaignId: stri
             setIsLoading(false)
         }
     }
+
+    const statConfig = rulesetConfig?.stats || [
+        { key: 'str', label: 'Strength' },
+        { key: 'dex', label: 'Dexterity' },
+        { key: 'con', label: 'Constitution' },
+        { key: 'int', label: 'Intelligence' },
+        { key: 'wis', label: 'Wisdom' },
+        { key: 'cha', label: 'Charisma' }
+    ]
 
     return (
         <form action={handleSubmit} className="flex flex-col" style={{ gap: '2rem', maxWidth: '800px', width: '100%' }}>
@@ -74,16 +93,16 @@ export default function CharacterCreationForm({ campaignId }: { campaignId: stri
 
             <div className="card glass">
                 <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>Ability Scores</h3>
-                <div className="grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' }}>
-                    {Object.entries(stats).map(([stat, score]) => (
-                        <div key={stat} className="flex flex-col items-center" style={{ gap: '0.5rem' }}>
-                            <label htmlFor={stat} style={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{stat}</label>
+                <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
+                    {statConfig.map((stat: any) => (
+                        <div key={stat.key} className="flex flex-col items-center" style={{ gap: '0.5rem' }}>
+                            <label htmlFor={stat.key} style={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{stat.label}</label>
                             <input
-                                id={stat}
-                                name={stat}
+                                id={stat.key}
+                                name={stat.key}
                                 type="number"
-                                value={score}
-                                onChange={(e) => handleStatChange(stat as keyof typeof stats, e.target.value)}
+                                value={stats[stat.key] || 10}
+                                onChange={(e) => handleStatChange(stat.key, e.target.value)}
                                 className="glass"
                                 style={{
                                     width: '100%',
@@ -99,9 +118,9 @@ export default function CharacterCreationForm({ campaignId }: { campaignId: stri
                             <div style={{
                                 fontSize: '0.9rem',
                                 fontWeight: 'bold',
-                                color: getMod(score) >= 0 ? 'var(--color-success)' : 'var(--color-error)'
+                                color: getMod(stats[stat.key] || 10) >= 0 ? 'var(--color-success)' : 'var(--color-error)'
                             }}>
-                                {formatMod(getMod(score))}
+                                {formatMod(getMod(stats[stat.key] || 10))}
                             </div>
                         </div>
                     ))}

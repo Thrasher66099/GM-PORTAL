@@ -17,15 +17,27 @@ export async function createCharacter(formData: FormData) {
     const race = formData.get('race') as string
     const characterClass = formData.get('class') as string
 
-    // Parse stats
-    const stats = {
-        str: parseInt(formData.get('str') as string) || 10,
-        dex: parseInt(formData.get('dex') as string) || 10,
-        con: parseInt(formData.get('con') as string) || 10,
-        int: parseInt(formData.get('int') as string) || 10,
-        wis: parseInt(formData.get('wis') as string) || 10,
-        cha: parseInt(formData.get('cha') as string) || 10,
-    }
+    // Fetch campaign ruleset to parse stats dynamically
+    const { data: campaign } = await supabase
+        .from('campaigns')
+        .select('ruleset_config')
+        .eq('id', campaignId)
+        .single()
+
+    // Default to 5e if no ruleset
+    const defaultStats = [
+        { key: 'str' }, { key: 'dex' }, { key: 'con' },
+        { key: 'int' }, { key: 'wis' }, { key: 'cha' }
+    ]
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const statConfig = (campaign?.ruleset_config as any)?.stats || defaultStats
+    const stats: Record<string, number> = {}
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    statConfig.forEach((stat: any) => {
+        stats[stat.key] = parseInt(formData.get(stat.key) as string) || 10
+    })
 
     // Create character
     const { data: character, error: createError } = await supabase
