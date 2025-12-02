@@ -1,11 +1,12 @@
 'use client'
 
-import { Stage, Layer, Image as KonvaImage, Circle, Line } from 'react-konva'
+import { Stage, Layer, Image as KonvaImage, Circle, Line, Rect, Group } from 'react-konva'
 import useImage from 'use-image'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import AddTokenModal from './AddTokenModal'
 import { updateMapTokens } from '@/app/actions/map'
+import { updateMapFog } from '@/app/actions/map-fog'
 
 type Token = {
     id: string
@@ -16,24 +17,37 @@ type Token = {
     character_id?: string
 }
 
+type FogShape = {
+    type: 'rect' | 'circle'
+    x: number
+    y: number
+    width?: number
+    height?: number
+    radius?: number
+}
+
 type MapData = {
     id: string
     image_url: string
     grid_data: { size: number, offset: { x: number, y: number } }
     tokens: Token[]
+    fog_data?: { revealed: FogShape[] }
 }
 
 export default function MapViewer({ mapId, campaignId, initialData, isGM = false, currentUserCharacterId }: { mapId: string, campaignId: string, initialData: MapData, isGM?: boolean, currentUserCharacterId?: string }) {
     const [mapData] = useState<MapData>(initialData)
     const [image] = useImage(mapData.image_url)
     const [tokens, setTokens] = useState<Token[]>(mapData.tokens || [])
+    const [fogShapes, setFogShapes] = useState<FogShape[]>(mapData.fog_data?.revealed || [])
     const [scale, setScale] = useState(1)
     const [position, setPosition] = useState({ x: 0, y: 0 })
+    const [activeTool, setActiveTool] = useState<'move' | 'fog-reveal'>('move')
+
     const supabase = createClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stageRef = useRef<any>(null)
 
-    // Sync tokens via Supabase Realtime
+    // Sync tokens and fog via Supabase Realtime
     useEffect(() => {
         const channel = supabase
             .channel(`map:${mapId}`)
@@ -48,6 +62,9 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
                 (payload) => {
                     if (payload.new.tokens) {
                         setTokens(payload.new.tokens as Token[])
+                    }
+                    if (payload.new.fog_data) {
+                        setFogShapes(payload.new.fog_data.revealed || [])
                     }
                 }
             )
@@ -78,6 +95,34 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleStageClick = async (e: any) => {
+        if (activeTool === 'fog-reveal' && isGM) {
+            const stage = e.target.getStage()
+            const pointer = stage.getPointerPosition()
+            const x = (pointer.x - stage.x()) / stage.scaleX()
+            const y = (pointer.y - stage.y()) / stage.scaleY()
+
+            // Snap to grid for cleaner reveal
+            const gridSize = mapData.grid_data.size
+            const snappedX = Math.floor(x / gridSize) * gridSize
+            const snappedY = Math.floor(y / gridSize) * gridSize
+
+            const newShape: FogShape = {
+                type: 'rect',
+                x: snappedX,
+                y: snappedY,
+                width: gridSize,
+                height: gridSize
+            }
+
+            const newShapes = [...fogShapes, newShape]
+            setFogShapes(newShapes)
+
+            // Debounce or just save immediately? Immediate for now.
+            await updateMapFog(mapId, { revealed: newShapes })
+        }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTokenDragEnd = async (e: any, tokenId: string) => {
         // Optimistic update
@@ -99,7 +144,6 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
             await updateMapTokens(mapId, newTokenState)
         } catch (error) {
             console.error('Failed to move token:', error)
-            // Revert on error (optional, but good UX)
         }
     }
 
@@ -136,26 +180,76 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
 
     const [showTokenModal, setShowTokenModal] = useState(false)
 
-    // ... (existing code)
-
     return (
         <div className="card glass" style={{ padding: 0, overflow: 'hidden', height: '600px', position: 'relative' }}>
-            {/* ... (Stage) ... */}
             <Stage
                 width={800} // Should be dynamic
                 height={600}
                 onWheel={handleWheel}
+                onClick={handleStageClick}
+                onTap={handleStageClick}
                 scaleX={scale}
                 scaleY={scale}
                 x={position.x}
                 y={position.y}
-                draggable
+                draggable={activeTool === 'move'}
                 ref={stageRef}
             >
                 <Layer>
                     {image && <KonvaImage image={image} />}
                     {renderGrid()}
                 </Layer>
+
+                {/* Fog Layer */}
+                <Layer>
+                    <Group>
+                        {/* The Fog Overlay (Black) */}
+                        {/* We use a giant rect that covers everything, then 'erase' parts of it */}
+                        {/* Note: Konva doesn't support 'masking' easily with composite operations on a single layer 
+                            without some tricks. A simpler way for MVP:
+                            Draw a giant black rect.
+                            Then draw 'erasing' shapes with globalCompositeOperation = 'destination-out'
+                        */}
+                        {image && (
+                            <>
+                                <Rect
+                                    x={0}
+                                    y={0}
+                                    width={image.width}
+                                    height={image.height}
+                                    fill="black"
+                                    opacity={isGM ? 0.5 : 1} // GM sees through fog partially
+                                    listening={false}
+                                />
+                                {fogShapes.map((shape, i) => (
+                                    shape.type === 'rect' ? (
+                                        <Rect
+                                            key={i}
+                                            x={shape.x}
+                                            y={shape.y}
+                                            width={shape.width}
+                                            height={shape.height}
+                                            fill="white"
+                                            globalCompositeOperation="destination-out"
+                                            listening={false}
+                                        />
+                                    ) : (
+                                        <Circle
+                                            key={i}
+                                            x={shape.x}
+                                            y={shape.y}
+                                            radius={shape.radius}
+                                            fill="white"
+                                            globalCompositeOperation="destination-out"
+                                            listening={false}
+                                        />
+                                    )
+                                ))}
+                            </>
+                        )}
+                    </Group>
+                </Layer>
+
                 <Layer>
                     {tokens.map(token => (
                         <Circle
@@ -164,7 +258,7 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
                             y={token.y}
                             radius={mapData.grid_data.size / 2 - 2}
                             fill={token.color}
-                            draggable={isGM || (!!token.character_id && token.character_id === currentUserCharacterId)} // Allow drag if GM or owner
+                            draggable={activeTool === 'move' && (isGM || (!!token.character_id && token.character_id === currentUserCharacterId))}
                             onDragEnd={(e) => handleTokenDragEnd(e, token.id)}
                             shadowColor="black"
                             shadowBlur={5}
@@ -175,10 +269,31 @@ export default function MapViewer({ mapId, campaignId, initialData, isGM = false
             </Stage>
 
             <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '4px' }}>
-                <small style={{ color: 'white' }}>Scroll to Zoom • Drag to Pan</small>
+                <small style={{ color: 'white' }}>Scroll to Zoom • {activeTool === 'move' ? 'Drag to Pan' : 'Click to Reveal'}</small>
             </div>
 
             {isGM && (
+                <div style={{ position: 'absolute', top: '1rem', left: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="btn-group vertical" style={{ background: 'var(--color-surface)', padding: '0.25rem', borderRadius: 'var(--radius-md)' }}>
+                        <button
+                            className={`btn btn-sm ${activeTool === 'move' ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setActiveTool('move')}
+                            title="Move / Pan"
+                        >
+                            ✋
+                        </button>
+                        <button
+                            className={`btn btn-sm ${activeTool === 'fog-reveal' ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setActiveTool('fog-reveal')}
+                            title="Reveal Fog"
+                        >
+                            🔦
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {isGM && activeTool === 'move' && (
                 <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', gap: '0.5rem' }}>
                     <button
                         className="btn btn-secondary"
