@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import InventoryList from '@/components/player/InventoryList'
+import { InventoryItem } from '@/app/player/character/inventory-actions'
 
 export default async function CharacterSheetPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -114,9 +116,13 @@ export default async function CharacterSheetPage({ params }: { params: Promise<{
                                 <span>1 + {getMod(stats['str'] || 10)} bludgeoning</span>
                             </div>
                         </div>
-                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                            (Inventory system coming soon)
-                        </p>
+
+                        <div style={{ marginTop: '2rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
+                            <InventoryList
+                                characterId={character.id}
+                                initialInventory={(character.inventory as unknown as InventoryItem[]) || []}
+                            />
+                        </div>
                     </div>
                 </div>
 
