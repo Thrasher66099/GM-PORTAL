@@ -134,21 +134,6 @@ create table game_logs (
 
 ---
 
-## Phase 4: The Game Table (Real-time)
-**Goal**: The shared space where the game happens.
-
-### 4.1 Map System
-*   [x] **Canvas/WebGL Viewer**: Use `react-konva` or HTML5 Canvas for the map.
-*   [ ] **Fog of War**: Implement a mask layer that the GM can erase/paint.
-*   [x] **Token Layer**: Draggable tokens synced via Supabase Realtime.
-*   [x] **Map Creation**: Upload and Generate (Stub) maps.
-*   [x] **Active Map**: GM can activate a map for players to see.
-*   [x] **Token Ownership**: Players can only move their own tokens.
-
-### 4.2 Dice & Chat
-*   [x] **Supabase Realtime**: Listen for `INSERT` on `game_logs`.
-*   [x] **Dice Animation**: Basic random number generation with history.
-*   [x] **Chat Window**: Standard chat interface with real-time updates.
 
 ---
 
